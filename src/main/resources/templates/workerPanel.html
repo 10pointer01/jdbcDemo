@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>菜单面板</title>
+  <link rel='stylesheet' href='../static/css/bootstrap.min.css'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="../static/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.8/dist/vue.js"></script>
+</head>
+<body>
+<div id="viewport">
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <header>
+      <a href="#">后台管理</a>
+    </header>
+    <ul class="nav">
+      <li>
+        <a href="#">
+          <i class="bi bi-card-list"></i> 控制面板
+        </a>
+      </li>
+      <li>
+        <a href="#">
+          <i class="bi bi-clipboard"></i> 文档管理
+        </a>
+      </li>
+      <li>
+        <a href="#">
+          <i class="bi bi-search"></i> 关于我们
+        </a>
+      </li>
+      <li>
+        <a href="#">
+          <i class="bi bi-gear"></i> 信息设置
+        </a>
+      </li>
+      <li>
+        <a href="http://192.168.1.85:8088/login">
+          <i class="bi bi-box-arrow-left"></i> 退出登录
+        </a>
+      </li>
+    </ul>
+  </div>
+  
+  <!-- Content -->
+  <div id="content">
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a>
+              <span>欢迎</span>
+              <b><em>{{user}}</em></b>
+              <span>,总有面板写的很生草</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <table class="table table-striped table-bordered table-hover text-center">
+        <thead>
+        <tr>
+          <th style="text-align:center">账号</th>
+          <th style="text-align:center">课程</th>
+          <th style="text-align:center">用户名</th>
+          <th style="text-align:center">密码</th>
+          <th style="text-align:center">操作</th>
+        </tr>
+        </thead>
+
+        <tr th:each="user:${users}">
+          <td th:text="${user.id}"></td>
+          <td th:text="${user.follower_id}"></td>
+          <td th:text="${user.username}"></td>
+          <td th:text="${user.password}"></td>
+          <td>
+            <a class="btn btn-primary btm" th:href="@{'/updatePage/'+${user.id} }">更改</a>
+            <a class="btn btn-danger btm" th:href="@{'/delete/'+${user.id}}">删除</a>
+          </td>
+        </tr>
+      </table>
+      <button class="btn btn-block" style="background-color: indianred;" ><a href="/useradd" style="color: #ffffff">添加用户</a></button>
+
+    </div>
+  </div>
+  
+  
+</div>
+<script>
+  new Vue({
+    el:"#content",
+    data:{
+      user:' [[${username}]] '
+    }
+  })
+</script>
+
+  
+</body>
+</html>

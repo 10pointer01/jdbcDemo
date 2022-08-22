@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>管理员主面板</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.js"></script>
+    <style>
+        .black_overlay {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #bbbbbb;
+        z-index: 1001;
+        /* z-index 属性设置元素的堆叠顺序。*/
+        opacity: .80;
+        /* opacity 属性设置元素的不透明级别。*/
+    }
+    .white_content {
+        display: none;
+        background-color: white;
+        z-index: 1002;
+        /*层级要比.black_overlay高，这样才能显示在它前面*/
+        overflow: auto;
+        border: 5px solid #93c3ec;
+        border-radius: 10px
+    }
+    #light {
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        text-align:center;
+        margin: 0 auto;
+        top: 25%; left: 0; bottom: 0; right: 0;
+    }
+        div.show_panel_add{
+            border: 5px solid #93c3ec;
+            border-radius: 10px;
+        }
+    </style>
+    <style>
+        a.btm{
+            color:#fff;
+        }
+        .bt{
+            width: 49%;
+        }
+        th,h1{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div class="titleMenu">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#">管理员设置</a></li>
+            <li><a href="http://192.168.1.85:8088/list">用户管理</a></li>
+            <li><a href="http://192.168.1.85:8088/search">关联查询</a></li>
+            <li><a href="#">功能2</a></li>
+            <li><a href="#">功能3</a></li>
+            <li><a href="#">功能4</a></li>
+            <li><a href="#">功能5</a></li>
+        </ul>
+    </div>
+    <table class="table table-striped table-bordered table-hover text-center">
+        <thead>
+        <tr style="text-align:center">
+            <th>账号</th>
+            <!--<th>教学编号</th>-->
+            <th>用户名</th>
+            <th>密码</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+
+        <tr th:each="manager:${managers}">
+            <td th:text="${manager.id}"></td>
+            <!--<td th:text="${manager.master_id}"></td>-->
+            <td th:text="${manager.managername}"></td>
+            <td th:text="${manager.password}"></td>
+            <td>
+                <button class="btn btn-primary btm" onclick="change(value)" th:value="${manager.id}">更改</button>
+                <a class="btn btn-danger btm" th:href="@{'/deleteManager/'+${manager.id}}">删除</a>
+            </td>
+        </tr>
+    </table>
+    <button class="btn btn-block" onclick="add()" style="background-color: indianred;color: aliceblue">添加管理员</button>
+    <button class="btn btn-block" style="background-color: cadetblue " ><a href="http://192.168.1.85:8088/login">返回登录页</a></button>
+    </div>
+    <div id="light" class="white_content show_panel_add"></div>
+    <div id="fade" class="black_overlay"></div>
+</body>
+<script>
+    function change(id){
+        //const ii=[[${managers[0].id}]];
+        $.ajax({
+            type : "get",
+            url : "/updateManagerPage?managerId="+id,
+            async:false,
+            success : function (data) {
+                document.getElementById('light').style.display='block';
+                document.getElementById('fade').style.display='block';
+                let divPanel="";
+                divPanel+=
+                    "<form action='http://192.168.1.85:8088/updateManager' method='post'>"+"<table>"+
+                    "账  号：<input class='form-control' name='id' type='text' value='"+data.id+"' readonly><br>"+
+                    //"教学编号：<input class='form-control' name='master_id' type='number' value='"+data.master_id+"'><br>"+
+                    "用户名：<input class='form-control' name='managername' type='text' value='"+data.managername+"'><br>"+
+                    "密  码：<input class='form-control' name='password' type='text' value='"+data.password+"'><br>"+
+                    "<button class='btn btn-lg btn-success' type='submit'>提交</button> " +
+                    "<button class='btn btn-lg btn-primary' onclick='fadeThis()'>返回</button> " +
+                    "</table></form>"
+                document.getElementById("light").innerHTML= divPanel ;
+            }
+        });
+    }
+
+    function  add(){
+        document.getElementById('light').style.display='block';
+        document.getElementById('fade').style.display='block';
+        let divPanel="";
+        divPanel+=
+            "<form action='http://192.168.1.85:8088/managerAdd' method='post'>"+
+            //"教学编号：<input class='form-control' name='master_id' type='number'><br>"+
+            "用户名：<input class='form-control' name='managername' type='text'><br>"+
+            "密  码：<input class='form-control' name='password' type='text'><br>"+
+            "<button class='btn btn-success btn-lg bt' type='submit'>提交</button> " +
+            "<button class='btn btn-lg btn-primary  bt'  type='button' onclick='fadeThis()'>返回</button> "+
+            "</form>"
+        document.getElementById("light").innerHTML= divPanel ;
+    }
+
+    function  fadeThis(){
+        document.getElementById('light').style.display='none';
+        document.getElementById('fade').style.display='none';
+    }
+</script>
+</html>

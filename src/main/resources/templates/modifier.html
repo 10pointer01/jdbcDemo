@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>修改用户</title>
+  <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <link th:href="@{/static/css/total_res.css}" rel="stylesheet">
+</head>
+<style>
+  div.show_panel_change{
+    height: 46.5%;
+    width: 30%;
+    margin-left:35%;
+    margin-top:10%;
+    border: 5px solid #93c3ec;
+    border-radius: 10px
+  }
+</style>
+<body>
+
+<div class="show_panel_change">
+  <form action="/update" method="post">
+    账号：<input class="form-control" name="id" type="number" th:value="${users.getId()}" readonly="readonly"><br>
+    课 程：<select id="managerList" style="width:100%;text-align:center" name="follower_id" class="form-control"></select><br>
+    用户名：<input class="form-control" type="text" th:value="${users.getUsername()}" name="username"><br>
+    密 码：<input class="form-control" type="text" th:value="${users.getPassword()}" name="password"><br>
+    <button class="btn btn-primary btn-lg btn-block" type="submit">提交</button>
+  </form>
+</div>
+<script th:inline="javascript">
+  let list=document.getElementById("managerList");
+  const size=[[${size}]];
+  let each=[[${managers}]];
+  for(let i=0;i<size;i++){
+    const src=each[i].id;
+    list+="<option value='"+src+"'>"+src+"</option>";
+  }
+  document.getElementById("managerList").innerHTML= list ;
+</script>
+
+</body>
+</html>
+

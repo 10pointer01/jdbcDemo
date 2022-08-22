@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo</title>
+    <!-- 引入 Bootstrap -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<style>
+    a.btm{
+        color:#fff;
+    }
+    th,h1{
+        text-align: center;
+    }
+</style>
+<body>
+<table class="table table-striped table-bordered table-hover text-center" id="nameTest">
+
+</table>
+</body>
+<script th:inline="javascript">
+    let name=[[${names}]]
+
+    let nametest="<thead>\n" +
+        "    <tr style=\"text-align:center\">\n" +
+        "        <th>username</th>\n" +
+        "        <th>managername</th>\n" +
+        "        <th>vistername</th>\n" +
+        "    </tr>\n" +
+        "    </thead>";
+    for(let i=0;i<name.length;i++) {
+        nametest+=
+            "<tr><td>"+name[i].username+"</td>"+
+            "<td>"+name[i].managername+"</td>"+
+            "<td>"+name[i].vistername+"</td></tr>"
+    }
+    document.getElementById("nameTest").innerHTML=nametest;
+
+
+</script>
+</html>

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>条目展示平台</title>
+    <link rel="stylesheet" href="../static/css/public.css" type="text/css">
+    <link rel="stylesheet" href="../static/css/index.css" type="text/css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.8/dist/vue.js"></script>
+
+</head>
+<body>
+<div id="div_body">
+    <div id="top">
+        <div class="top_center max_div center_div">
+            <div class="top_center_left">
+                <div class="div_logo">
+                    <img src="../img/logo.png" alt="">
+                </div>
+                <div class="div_title">
+                    条目展示平台
+                </div>
+            </div>
+            <div class="top_center_right">
+                <div class="div_login">
+                        <div>欢迎</div>
+                        <em><span  style="color: #368fdc">{{user}}</span></em>
+                        <div>,总有面板写的很生草</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="type">
+        <div class="type_center max_div center_div">
+            <ul>
+                <li v-bind:class="{'li_show':type_ID===0}" v-on:click="type_ID=0">平台接口</li>
+                <li v-bind:class="{'li_show':type_ID===1}" v-on:click="type_ID=1">硬件接口</li>
+            </ul>
+        </div>
+    </div>
+    <div id="content">
+        <div class="content_center max_div center_div">
+            <div v-bind:class="{'div_show':type_ID===0}" id="div_platformInterface">
+                <div class="div_menu">
+                    <div class="div_menu_input">
+                        <div>
+                            <div class="div_input">
+                                <div>
+                                    <div class="div_icon">
+                                        <img src="../static/image/shousuo.png" alt="">
+                                    </div>
+                                    <input type="text" v-model="platformInterface.search" autocomplete="off" placeholder="搜索......">
+                                </div>
+                            </div>
+                            <div class="div_button" v-if="platformInterface.if_search" v-on:click="search_button(platformInterface.id)">
+                                取消
+                            </div>
+                        </div>
+                    </div>
+                    <div class="div_menu_list">
+                        <div class="div_scrollbar">
+                            <ul v-if="!platformInterface.if_search">
+                                <li v-for="(menu,index) in platformInterface.dataList">
+                                    <div class="li_title li_check " v-bind:class="{'li_show':menu.show}" v-on:click="clickJump(getMadianIdByTitle(index,platformInterface.id),platformInterface.id,index,null)">{{menu.title}}</div>
+                                    <ul class="li_ul">
+                                        <li class="li_check" v-for="(menu_li,index2) in menu.data"  v-bind:class="{'li_show':menu_li.show}" v-on:click="clickJump(getMadianIdByTitle_t(index,index2,platformInterface.id),platformInterface.id,null,index+'_'+index2)"><div>{{menu_li.title}}</div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <ul v-if="platformInterface.if_search" class="ul_shousuo">
+                                <li v-for="(menu,index) in platformInterface.dataList">
+                                    <ul class="li_ul">
+                                        <li class="li_check" v-for="(menu_li,index2) in menu.data" v-if="menu_li.title_show"  v-bind:class="{'li_show':menu_li.show}" v-on:click="clickJump(getMadianIdByTitle_t(index,index2,platformInterface.id),platformInterface.id,null,index+'_'+index2)"><div>{{menu_li.title}}</div></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="div_list div_scrollbar">
+                    <div>
+                        <ul>
+                            <li  v-for="(li,index) in platformInterface.dataList" v-bind:id="getMadianIdByTitle(index,platformInterface.id)">
+                                <div class="li_title">{{li.title}}</div>
+                                <div class="li_text" >
+                                    <ul>
+                                        <li v-for="(li_d,index2) in li.data" v-bind:id="getMadianIdByTitle_t(index,index2,platformInterface.id)">
+                                            <div class="li_name">{{li.title}}-{{li_d.title}}</div>
+                                            <div class="li_mode">
+                                                <div>
+                                                    <div>{{li_d.type}}</div>
+                                                </div>
+                                                <div>{{li_d.url}}</div>
+                                            </div>
+                                            <div class="li_tit" v-if="ifShowParameter(li_d.parameter)">参数</div>
+                                            <div class="li_table" v-if="ifShowParameter(li_d.parameter)">
+                                                <table>
+                                                    <thead>
+                                                    <tr>
+                                                        <th>字段</th>
+                                                        <th>类型</th>
+                                                        <th>描述</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr v-for="t in li_d.parameter">
+                                                        <td>{{t.key}}</td>
+                                                        <td>{{t.type}}</td>
+                                                        <td v-html="t.describe">{{t.describe}}</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div v-bind:class="{'div_show': type_ID===1}" id="div_hardwareInterface">
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    new Vue({
+        el:"#div_body",
+        data:{
+            type_ID:0,
+            user:"MRS",
+            platformInterface:{
+                id:0,
+                search:"",
+                if_search:false,
+                Scroll:0,
+                dataList:[]
+            },
+            hardwareInterface:{
+                id:1,
+                search:"",
+                if_search:false,
+                Scroll:0,
+                dataList:[]
+            }
+        },
+        created:function(){
+            //初始化页面
+            this.type_ID = 0;
+            //获取平台接口
+            this.getDate();
+        },
+        computed:{
+
+        },
+        methods:{
+            getDate:function () {
+                if(this.type_ID==0){
+                    //获取平台接口
+                    this.platformInterface.dataList = [
+                        {
+                            title:"通道相关",
+                            show:false,
+                            data:[
+                                {
+                                    title:"ONVIF探测",
+                                    title_show:false,
+                                    show:false,
+                                    type:"GET",
+                                    url:"/api/v1/probedevice",
+                                    parameter:[
+                                        {
+                                            key:"IP",
+                                            type:"String",
+                                            describe:"<p>发现的设备IP</p>"
+                                        },
+                                        {
+                                            key:"Username",
+                                            type:"String",
+                                            describe:"<p>设备用户名</p>"
+                                        },
+                                        {
+                                            key:"Password",
+                                            type:"String",
+                                            describe:"<p>设备密码(明文)</p>"
+                                        }
+                                    ]
+                                },
+                                {
+                                    title:"上传配置数据",
+                                    title_show:false,
+                                    show:false,
+                                    type:"POST",
+                                    url:"/api/v1/uploadxlsx",
+                                    parameter:[]
+                                },
+                                {
+                                    title:"云台控制",
+                                    title_show:false,
+                                    show:false,
+                                    type:"GET",
+                                    url:"/api/v1/ptzcontrol",
+                                    parameter:[
+                                        {
+                                            key:"channel",
+                                            type:"Number",
+                                            describe:"<p>指定通道号</p>"
+                                        },
+                                        {
+                                            key:"command",
+                                            type:"String",
+                                            describe:"<p>动作命令</p><p>允许值:<span>stop, up, down, left, right</span></p>"
+                                        }
+                                    ]
+                                },
+                                {
+                                    title:"保存通道配置",
+                                    title_show:false,
+                                    show:false,
+                                    type:"GET",
+                                    url:"/api/v1/setchannelconfig",
+                                    parameter:[
+                                        {
+                                            key:"Channel",
+                                            type:"Number",
+                                            describe:"<p>通道号</p>"
+                                        },
+                                        {
+                                            key:"Enable",
+                                            type:"String",
+                                            describe:"<p>是否启用</p><p>允许值: <span>0, 1</span></p>"
+                                        },
+                                        {
+                                            key:"OnDemand",
+                                            type:"String",
+                                            describe:"<p>按需直播</p><p>允许值: <span>0, 1</span></p>"
+                                        },
+                                        {
+                                            key:"Name",
+                                            type:"String",
+                                            describe:"<p>通道名称</p>"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            title:"录像回看",
+                            show:false,
+                            data:[
+                                {
+                                    title:"下载录像文件",
+                                    title_show:false,
+                                    show:false,
+                                    type:"GET",
+                                    url:"/api/v1/record/download",
+                                    parameter:[
+                                        {
+                                            key:"id",
+                                            type:"String",
+                                            describe:"<p>通道号</p>"
+                                        },
+                                        {
+                                            key:"period",
+                                            type:"String",
+                                            describe:"<p>录像开始时间, YYYYMMDDHHmmss</p>"
+                                        }
+                                    ]
+                                },
+                                {
+                                    title:"删除单条录像",
+                                    title_show:false,
+                                    show:false,
+                                    type:"GET",
+                                    url:"/api/v1/record/remove",
+                                    parameter:[
+                                        {
+                                            key:"id",
+                                            type:"String",
+                                            describe:"<p>通道号</p>"
+                                        }
+                                    ]
+                                },
+                                {
+                                    title:"删除通道所有录像",
+                                    title_show:false,
+                                    show:false,
+                                    type:"GET",
+                                    url:"/api/v1/record/removedevice",
+                                    parameter:[
+                                        {
+                                            key:"id",
+                                            type:"String",
+                                            describe:"<p>通道号</p>"
+                                        }
+                                    ]
+                                },
+                                {
+                                    title:"按日查询通道录像",
+                                    title_show:false,
+                                    show:false,
+                                    type:"GET",
+                                    url:"/api/v1/record/querydaily",
+                                    parameter:[
+                                        {
+                                            key:"id",
+                                            type:"String",
+                                            describe:"<p>通道号</p>"
+                                        },
+                                        {
+                                            key:"period",
+                                            type:"String",
+                                            describe:"<p>日期, YYYYMMDD</p>"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ];
+                }else if(this.type_ID==1){
+                    //获取硬件接口
+
+                }
+            },
+            //判断Parameter是否为空，为空就隐藏
+            ifShowParameter:function (obj) {
+                return obj.length > 0;
+            },
+            //获取一级标题锚点id
+            getMadianIdByTitle:function (index,id) {
+                return "api_"+id+"_"+index;
+            },
+            //获取二级标题锚点id
+            getMadianIdByTitle_t:function (index,index2,id) {
+                return "api_"+id+"_"+index+"_"+index2;
+            },
+            //点击菜单右边跳转到指定内容位置
+            clickJump:function (id,type,index,index2) {
+                if(type==0){
+                    // $.each(this.platformInterface.dataList,function (k,v) {
+                    //     if(index==k){
+                    //         v.show = true;
+                    //     }else{
+                    //         v.show = false;
+                    //     }
+                    //     $.each(v.data,function (k1,v1) {
+                    //         if(k+"_"+k1==index2){
+                    //             v1.show = true;
+                    //         }else{
+                    //             v1.show = false;
+                    //         }
+                    //     });
+                    // });
+                    var h = Math.abs($("#"+id).position().top);
+                    $("#div_platformInterface .div_list").animate({
+                        scrollTop : h
+                    },1000);
+                }else if(type==1){
+                    console.log(2);
+                }
+            },
+            //取消
+            search_button:function(t){
+                if(t == this.platformInterface.id){
+                    this.platformInterface.search="";
+                }else if(t == this.hardwareInterface.id){
+                    this.hardwareInterface.search="";
+                }
+            },
+            handleScroll:function(e){
+                if($(e.target).parent().attr("id")=="div_platformInterface"){
+                    this.platformInterface.Scroll = e.target.scrollTop;
+                }else if($(e.target).parent().attr("id")=="div_hardwareInterface"){
+                    this.hardwareInterface.Scroll = e.target.scrollTop;
+                }
+            }
+        },
+        mounted:function () {
+            window.addEventListener('scroll',this.handleScroll,true)
+        },
+        watch:{
+            'platformInterface.Scroll':function (val,oldval) {
+                // console.log(val);
+            },
+            'hardwareInterface.Scroll':function () {
+
+            },
+            'platformInterface.search':function (val,oldval) {
+                var _this = this;
+                if(!_this.platformInterface.if_search){
+                    var search = eval("/^.*?"+val+".*?$/");
+                    $.each(_this.platformInterface.dataList,function (k,v) {
+                        $.each(v.data,function (k1,v1) {
+                            if(search.test(v1.title)){
+                                console.log(v1.title);
+                                v1.title_show = true;
+                            }else{
+                                v1.title_show = false;
+                            }
+                        });
+                    });
+                }
+                _this.platformInterface.if_search = val.length > 0;
+            },
+            'hardwareInterface.search':function (val,oldval) {
+                var _this = this;
+                _this.hardwareInterface.if_search = val.length > 0;
+            }
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>用户登录</title>
+    <link href="/static/css/mui.min.css" rel="stylesheet"/>
+    <link href="/static/css/total_res.css" rel="stylesheet"/>
+    <link th:href="@{https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css}" rel="stylesheet">
+    <script th:src="@{https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js}"></script>
+    <script th:src="@{https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.js}"></script>
+    <script src="/static/js/mui.js"></script>
+    <style>
+        .center{
+            height:10%;
+            width: 100%;
+            margin-left:0;
+            margin-top: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center
+        }
+        #toast{
+            text-align:center;
+        }
+    </style>
+</head>
+<body>
+<div class="center"><span id="toast"></span></div>
+<div class="show_panel">
+    <form  th:action="@{http://192.168.1.85:8088/loginCheck}" th:object="${Manager}" th:method="post">
+        <div class="mui-input-row">
+           账 号：<input class="form-control" type="text" th:field="*{id}"   id="id" placeholder="请输入管理员ID"/>
+        </div>
+        <div class="mui-input-row">
+           密 码：<input class="form-control" type="password" th:field="*{password}" id="password" placeholder="请输入管理员密码"/>
+        </div>
+
+        <ul class="mui-table-view mui-table-view-chevron">
+            <li class="mui-table-view-cell">
+                自动登录：
+                <div id="autoLogin" class="mui-switch">
+                    <div class="mui-switch-handle"></div>
+                </div>
+            </li>
+        </ul>
+
+        <button class="btn btn-primary btn-lg btn-block" type="button" onclick="Login()">登录</button>
+    </form>
+</div>
+
+
+</body>
+<script>
+    function Login(){
+        const id=document.getElementById("id").value;
+        const password=document.getElementById("password").value;
+        let isActive = document.getElementById("autoLogin").classList.contains("mui-active");
+        if(id===""&&password==""){
+            show();
+            document.getElementById("toast").innerHTML="<span class=\"alert alert-danger center\" id='toast'>账号密码不能为空!</span>";
+        }
+        else if(id==""){
+            show();
+            document.getElementById("toast").innerHTML="<span class=\"alert alert-danger center\" id='toast'>账号不能为空!</span>";
+        }
+        else if(password==""){
+            show();
+            document.getElementById("toast").innerHTML="<span class=\"alert alert-danger center\" id='toast'>密码不能为空!</span>";
+        }
+        else{
+            if(isActive==false)isActive=null;
+            $.ajax({
+                'url': 'http://192.168.1.85:8088/loginCheck',
+                'type' : 'post',
+                'async': true,
+                'data':{
+                    'id':id,
+                    'password':password,
+                    'auto':isActive
+                },
+                'dataType':'text',
+                'success': function (result) {
+                    if(result==1){
+                        window.open("http://192.168.1.85:8088/main",'_self')
+                    }
+                    else if(result==0){
+                        show();
+                        document.getElementById("toast").innerHTML="<span class=\"alert alert-danger center\" id='toast'>密码错误！</span>"
+                    }
+                    else if(result==-1){
+                        show();
+                        document.getElementById("toast").innerHTML="<span class=\"alert alert-danger center\" id='toast'>管理员ID无效！</span>"
+                    }
+                },
+                'error':function(result){
+                    console.log(result);
+                }
+            });
+        }
+    }
+
+    $(document).ready(document.getElementById("toast").innerHTML="<span class=\"alert alert-success\" id='toast'>欢迎！</span>")
+
+    function fade(){
+        $("#toast").fadeToggle(1000);
+    }
+    setTimeout(fade,1000);
+
+    function show(){
+        $("#toast").fadeIn("fast");
+        setTimeout(fade,1000)
+    }
+
+</script>
+</html>
